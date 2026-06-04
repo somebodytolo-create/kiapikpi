@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>전략기획본부 실적 대시보드 2026</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --navy:#0d1b3e;
+  --navy2:#142248;
+  --blue:#1e40af;
+  --sky:#3b82f6;
+  --sky-light:#60a5fa;
+  --teal:#0891b2;
+  --purple:#7c3aed;
+  --green:#059669;
+  --orange:#ea580c;
+  --rose:#e11d48;
+  --gold:#d97706;
+  --bg:#f1f5f9;
+  --card:#ffffff;
+  --border:#e2e8f0;
+  --text:#0f172a;
+  --muted:#64748b;
+  --light:#94a3b8;
+}
+
+body{
+  font-family:'Pretendard','Nanum Gothic','나눔고딕','Malgun Gothic','맑은 고딕',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+/* ── HERO HEADER ── */
+.hero{
+  background:linear-gradient(135deg,#0d1b3e 0%,#1e3a8a 45%,#1e40af 100%);
+  padding:0;
+  position:relative;
+  overflow:hidden;
+}
+.hero::before{
+  content:'';
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 70% -10%,rgba(96,165,250,.18) 0%,transparent 60%),
+             radial-gradient(ellipse 40% 40% at 10% 100%,rgba(124,58,237,.12) 0%,transparent 60%);
+}
+.hero-inner{
+  position:relative;z-index:1;
+  max-width:1380px;margin:0 auto;
+  padding:36px 36px 28px;
+  display:flex;align-items:flex-end;justify-content:space-between;gap:24px;
+  flex-wrap:wrap;
+}
+.hero-brand{display:flex;align-items:center;gap:16px}
+.hero-emblem{
+  width:56px;height:56px;
+  background:linear-gradient(135deg,rgba(255,255,255,.25),rgba(255,255,255,.08));
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;
+  backdrop-filter:blur(8px);
+  flex-shrink:0;
+}
+.hero-text h1{
+  font-size:22px;font-weight:800;color:#fff;letter-spacing:-.3px;
+}
+.hero-text p{
+  font-size:13px;color:rgba(255,255,255,.65);margin-top:3px;font-weight:400;
+}
+.hero-stats{
+  display:flex;align-items:flex-end;gap:28px;
+  padding-bottom:2px;
+}
+.hero-stat{text-align:right}
+.hero-stat-val{font-size:30px;font-weight:800;color:#fff;line-height:1}
+.hero-stat-lbl{font-size:11px;color:rgba(255,255,255,.55);margin-top:3px;font-weight:400}
+
+/* nav tabs */
+.nav-tabs{
+  background:var(--navy2);
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.nav-tabs-inner{
+  max-width:1380px;margin:0 auto;
+  padding:0 36px;
+  display:flex;gap:4px;
+}
+.nav-tab{
+  padding:12px 20px;
+  font-size:13px;font-weight:600;color:rgba(255,255,255,.5);
+  cursor:pointer;border-bottom:2px solid transparent;
+  transition:all .2s;white-space:nowrap;
+  display:flex;align-items:center;gap:6px;
+}
+.nav-tab:hover{color:rgba(255,255,255,.8)}
+.nav-tab.active{color:#60a5fa;border-bottom-color:#60a5fa}
+
+/* ── MAIN ── */
+.main{max-width:1380px;margin:0 auto;padding:28px 36px 48px}
+
+/* Section label */
+.sec-label{
+  font-size:11px;font-weight:700;letter-spacing:.08em;
+  color:var(--muted);text-transform:uppercase;
+  margin-bottom:14px;display:flex;align-items:center;gap:8px;
+}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── KPI CARDS ── */
+.kpi-row{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:16px;
+  margin-bottom:28px;
+}
+
+.kc{
+  background:var(--card);
+  border-radius:16px;
+  padding:22px 20px;
+  box-shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
+  display:flex;flex-direction:column;gap:14px;
+  position:relative;overflow:hidden;
+  transition:transform .18s,box-shadow .18s;
+}
+.kc:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.10)}
+.kc::after{
+  content:'';
+  position:absolute;top:0;left:0;right:0;height:3px;
+  border-radius:16px 16px 0 0;
+}
+.kc-patent::after{background:linear-gradient(90deg,#1e40af,#3b82f6)}
+.kc-paper::after {background:linear-gradient(90deg,#7c3aed,#a78bfa)}
+.kc-sw::after    {background:linear-gradient(90deg,#059669,#34d399)}
+.kc-tech::after  {background:linear-gradient(90deg,#ea580c,#fb923c)}
+.kc-equip::after {background:linear-gradient(90deg,#0891b2,#38bdf8)}
+
+.kc-top{display:flex;align-items:flex-start;justify-content:space-between}
+.kc-icon-wrap{
+  width:42px;height:42px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+}
+.kc-patent .kc-icon-wrap{background:#dbeafe}
+.kc-paper  .kc-icon-wrap{background:#ede9fe}
+.kc-sw     .kc-icon-wrap{background:#d1fae5}
+.kc-tech   .kc-icon-wrap{background:#ffedd5}
+.kc-equip  .kc-icon-wrap{background:#cffafe}
+
+.kc-mid{display:flex;align-items:flex-end;gap:6px}
+.kc-val{font-size:40px;font-weight:800;line-height:1}
+.kc-patent .kc-val{color:#1e40af}
+.kc-paper  .kc-val{color:#7c3aed}
+.kc-sw     .kc-val{color:#059669}
+.kc-tech   .kc-val{color:#ea580c}
+.kc-equip  .kc-val{color:#0891b2}
+.kc-unit{font-size:15px;font-weight:500;color:var(--muted);margin-bottom:6px}
+
+/* ── CHART ROW ── */
+.chart-row{
+  display:grid;
+  grid-template-columns:3fr 2fr;
+  gap:16px;
+  margin-bottom:28px;
+}
+.chart-card{
+  background:var(--card);
+  border-radius:16px;
+  padding:24px;
+  box-shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
+}
+.chart-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:20px;
+}
+.chart-title{font-size:14px;font-weight:700;color:var(--text)}
+.chart-sub  {font-size:12px;color:var(--muted);margin-top:2px}
+.chart-legend{
+  display:flex;gap:12px;flex-wrap:wrap;
+}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+/* ── LINKS STRIP ── */
+.links-row{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:12px;
+  margin-bottom:28px;
+}
+.link-card{
+  background:var(--card);
+  border-radius:14px;
+  padding:16px;
+  box-shadow:0 1px 3px rgba(0,0,0,.06);
+}
+.link-card-head{
+  font-size:12px;font-weight:700;color:var(--text);
+  margin-bottom:10px;display:flex;align-items:center;gap:6px;
+}
+.link-card-head span{font-size:15px}
+.lbtn{
+  display:flex;align-items:center;gap:7px;
+  padding:8px 11px;border-radius:9px;
+  font-size:12px;font-weight:600;
+  text-decoration:none;
+  margin-bottom:6px;
+  transition:all .15s;
+  border:1px solid transparent;
+}
+.lbtn:last-child{margin-bottom:0}
+.lbtn:hover{filter:brightness(.93);transform:translateX(2px)}
+.lbtn-curr{background:#eff6ff;color:#1d4ed8;border-color:#dbeafe}
+.lbtn-hist{background:#faf5ff;color:#7c3aed;border-color:#ede9fe}
+.lbtn-team{background:#f0fdf4;color:#166534;border-color:#dcfce7}
+.lbtn-ico{font-size:13px;flex-shrink:0}
+.lbtn-txt{line-height:1.2}
+
+/* ── DETAIL TABLES ── */
+.detail-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin-bottom:16px;
+}
+.tbl-card{
+  background:var(--card);
+  border-radius:16px;
+  padding:22px;
+  box-shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
+}
+.tbl-head{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:16px;
+}
+.tbl-ico{
+  width:34px;height:34px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;
+}
+.tbl-ico-patent{background:#dbeafe}
+.tbl-ico-sw    {background:#d1fae5}
+.tbl-ico-paper {background:#ede9fe}
+.tbl-ico-hist  {background:#f1f5f9}
+.tbl-head-text h3{font-size:14px;font-weight:700}
+.tbl-head-text p{font-size:11px;color:var(--muted);margin-top:1px}
+.badge-cnt{
+  margin-left:auto;
+  background:#f8fafc;border:1px solid var(--border);
+  border-radius:20px;padding:4px 10px;
+  font-size:12px;font-weight:700;color:var(--muted);
+}
+
+table.dt{width:100%;border-collapse:collapse;font-size:12px}
+table.dt th{
+  padding:9px 10px;text-align:left;
+  font-weight:700;font-size:11px;color:var(--muted);
+  background:#f8fafc;
+  border-bottom:1px solid var(--border);
+}
+table.dt td{
+  padding:10px 10px;
+  border-bottom:1px solid #f8fafc;
+  vertical-align:middle;color:var(--text);
+  line-height:1.4;
+}
+table.dt tr:last-child td{border-bottom:none}
+table.dt tr:hover td{background:#fafbfd}
+.tag{
+  display:inline-block;font-size:10px;font-weight:700;
+  padding:2px 7px;border-radius:5px;white-space:nowrap;
+}
+.tag-reg{background:#dcfce7;color:#15803d}
+.tag-app{background:#fef9c3;color:#854d0e}
+.tag-intl{background:#dbeafe;color:#1d4ed8}
+.tag-dom{background:#f3e8ff;color:#7e22ce}
+.tag-conf{background:#fff1f2;color:#be123c}
+.tag-journ{background:#ecfeff;color:#155e75}
+.num-badge{
+  font-size:11px;font-weight:700;color:var(--muted);
+  background:#f8fafc;border:1px solid var(--border);
+  width:22px;height:22px;border-radius:6px;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+
+/* ── PAPER TABLE (wide) ── */
+.paper-card{
+  background:var(--card);
+  border-radius:16px;
+  padding:22px;
+  box-shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
+  margin-bottom:16px;
+}
+
+/* ── HISTORY TABLE ── */
+.hist-card{
+  background:var(--card);
+  border-radius:16px;
+  padding:22px;
+  box-shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
+  margin-bottom:16px;
+  overflow-x:auto;
+}
+table.ht{width:100%;border-collapse:collapse;font-size:13px;min-width:600px}
+table.ht thead tr{background:linear-gradient(135deg,var(--navy),#1e40af)}
+table.ht th{
+  padding:12px 16px;color:#fff;font-weight:700;font-size:12px;
+  text-align:center;white-space:nowrap;
+}
+table.ht th:first-child{text-align:left;border-radius:10px 0 0 0}
+table.ht th:last-child{border-radius:0 10px 0 0}
+table.ht td{
+  padding:11px 16px;text-align:center;
+  font-weight:600;border-bottom:1px solid #f1f5f9;
+  font-size:13px;
+}
+table.ht td:first-child{text-align:left;font-weight:700;color:var(--text)}
+table.ht tr:last-child td{border-bottom:none}
+table.ht tr.yr-2026 td{background:#fffbeb;font-weight:800}
+table.ht tr.yr-2026 td:first-child{color:#b45309}
+table.ht tr:not(.yr-2026):hover td{background:#fafbfd}
+.c-pat{color:#1d4ed8}.c-pap{color:#7c3aed}
+.c-sw{color:#059669}.c-tec{color:#ea580c}.c-eq{color:#0891b2}
+.c-tot{color:var(--text);font-weight:800}
+
+/* note */
+.note{font-size:11px;color:var(--light);margin-top:10px}
+
+/* footer */
+.footer{
+  max-width:1380px;margin:0 auto;
+  padding:20px 36px;
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:11px;color:var(--light);
+  border-top:1px solid var(--border);
+  flex-wrap:wrap;gap:8px;
+}
+
+@media(max-width:1100px){
+  .kpi-row{grid-template-columns:repeat(3,1fr)}
+  .links-row{grid-template-columns:repeat(3,1fr)}
+  .chart-row{grid-template-columns:1fr}
+}
+/* ── CSS 막대 차트 ── */
+.cc-area{display:flex;align-items:flex-end;gap:7px;padding-bottom:0}
+.cc-col{flex:1;display:flex;flex-direction:column;align-items:center;min-width:0}
+.cc-top-lbl{font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;line-height:1}
+.cc-bar{width:100%;display:flex;flex-direction:column-reverse;gap:1px;border-radius:3px 3px 0 0;overflow:hidden}
+.cc-s{width:100%;flex-shrink:0;min-height:0}
+.cc-yr{font-size:10px;color:var(--muted);margin-top:6px;font-weight:500;white-space:nowrap}
+.cc-col.col-cur .cc-yr{color:var(--primary);font-weight:800}
+.cc-col.col-cur .cc-bar{outline:2px dashed #93c5fd;outline-offset:1px;border-radius:3px}
+.s-pat{background:#3b82f6}.s-pap{background:#a78bfa}
+.s-sw{background:#34d399}.s-tec{background:#fb923c}
+
+/* ── 전년비교 카드 ── */
+.comp-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.comp-row:last-child{margin-bottom:0}
+.comp-cat{width:72px;font-size:11px;font-weight:700;color:var(--text);flex-shrink:0}
+.comp-bars{flex:1;display:flex;flex-direction:column;gap:5px}
+.comp-bar-wrap{display:flex;align-items:center;gap:7px}
+.comp-yr{width:28px;font-size:10px;color:var(--light);text-align:right;flex-shrink:0}
+.comp-track{flex:1;height:7px;background:#f1f5f9;border-radius:4px;overflow:hidden}
+.comp-fill{height:100%;border-radius:4px;transition:width .6s ease}
+.comp-n{width:22px;font-size:11px;font-weight:700;color:var(--text);text-align:right;flex-shrink:0}
+.comp-delta{
+  width:36px;text-align:center;font-size:11px;font-weight:700;flex-shrink:0;
+}
+.d-up{color:#059669}.d-dn{color:#94a3b8}.d-eq{color:#94a3b8}
+
+/* ── 페이지 전환 ── */
+.page-section{animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── 탭 페이지 내 링크 배너 ── */
+.page-links{
+  display:flex;gap:10px;flex-wrap:wrap;
+  background:var(--card);border-radius:14px;
+  padding:16px 20px;
+  box-shadow:0 1px 3px rgba(0,0,0,.06);
+  margin-bottom:16px;align-items:center;
+}
+.page-links-label{font-size:12px;font-weight:700;color:var(--muted);margin-right:4px;flex-shrink:0}
+.page-links .lbtn{margin-bottom:0}
+@media(max-width:700px){
+  .main{padding:20px 16px 40px}
+  .kpi-row{grid-template-columns:1fr 1fr}
+  .links-row{grid-template-columns:1fr 1fr}
+  .detail-row{grid-template-columns:1fr}
+  .hero-inner{padding:24px 20px 20px}
+  .nav-tabs-inner{padding:0 16px;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-brand">
+      <div class="hero-emblem">🚗</div>
+      <div class="hero-text">
+        <h1>(재)지능형자동차부품진흥원 전략기획본부</h1>
+        <p>연구성과 실적 관리 대시보드 &nbsp;·&nbsp; 업데이트 2026.03.31</p>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-val">14</div>
+        <div class="hero-stat-lbl">2026 총 실적 건수</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-val">5</div>
+        <div class="hero-stat-lbl">성과 카테고리</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- nav -->
+<div class="nav-tabs">
+  <div class="nav-tabs-inner">
+    <div class="nav-tab active" data-target="section-summary">📊 실적 현황</div>
+    <div class="nav-tab" data-target="section-patent">🔬 특허</div>
+    <div class="nav-tab" data-target="section-paper">📄 논문</div>
+    <div class="nav-tab" data-target="section-sw">💻 SW 등록</div>
+    <div class="nav-tab" data-target="section-tech">🤝 기술이전</div>
+    <div class="nav-tab" data-target="section-history">⚙️ 장비관리</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ── 항상 표시: 실적 요약 카드 ── -->
+  <div class="sec-label">2026 실적 현황</div>
+  <div class="kpi-row">
+
+    <div class="kc kc-patent">
+      <div class="kc-top">
+        <div class="kc-icon-wrap">🔬</div>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px">특허</div>
+      <div class="kc-mid">
+        <div class="kc-val">4</div>
+        <div class="kc-unit">건</div>
+      </div>
+    </div>
+
+    <div class="kc kc-paper">
+      <div class="kc-top">
+        <div class="kc-icon-wrap">📄</div>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px">학술논문</div>
+      <div class="kc-mid">
+        <div class="kc-val">8</div>
+        <div class="kc-unit">건</div>
+      </div>
+    </div>
+
+    <div class="kc kc-sw">
+      <div class="kc-top">
+        <div class="kc-icon-wrap">💻</div>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px">SW 등록</div>
+      <div class="kc-mid">
+        <div class="kc-val">2</div>
+        <div class="kc-unit">건</div>
+      </div>
+    </div>
+
+    <div class="kc kc-tech">
+      <div class="kc-top">
+        <div class="kc-icon-wrap">🤝</div>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px">기술이전</div>
+      <div class="kc-mid">
+        <div class="kc-val">0</div>
+        <div class="kc-unit">건</div>
+      </div>
+    </div>
+
+    <div class="kc kc-equip">
+      <div class="kc-top">
+        <div class="kc-icon-wrap">⚙️</div>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px">장비 현황 (누적)</div>
+      <div class="kc-mid">
+        <div class="kc-val">21</div>
+        <div class="kc-unit">건</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ PAGE: 실적현황 (기본) ══ -->
+  <div class="page-section" data-page="overview">
+    <div class="sec-label">연도별 실적 추이</div>
+    <div class="chart-row">
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">연도별 실적 추이 (2020 – 2026)</div>
+            <div class="chart-sub">특허·논문·SW 등록·기술이전 연간 성과</div>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>특허</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#a78bfa"></div>논문</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#34d399"></div>SW</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#fb923c"></div>기술이전</div>
+          </div>
+        </div>
+        <canvas id="trendChart" height="160"></canvas>
+      </div>
+
+      <!-- 전년 대비 비교 -->
+      <div class="chart-card" style="display:flex;flex-direction:column;justify-content:space-between">
+        <div class="chart-head" style="margin-bottom:16px">
+          <div>
+            <div class="chart-title">전년 대비 현황</div>
+            <div class="chart-sub">2025 연간 vs 2026 (3월 기준)</div>
+          </div>
+        </div>
+        <div style="flex:1">
+          <!-- 특허: max=34 -->
+          <div class="comp-row">
+            <div class="comp-cat">🔬 특허</div>
+            <div class="comp-bars">
+              <div class="comp-bar-wrap">
+                <div class="comp-yr">2025</div>
+                <div class="comp-track"><div class="comp-fill" style="width:88%;background:#93c5fd"></div></div>
+                <div class="comp-n" style="color:#1d4ed8">30</div>
+              </div>
+              <div class="comp-bar-wrap">
+                <div class="comp-yr">2026</div>
+                <div class="comp-track"><div class="comp-fill" style="width:12%;background:#1d4ed8"></div></div>
+                <div class="comp-n" style="color:#1d4ed8">4</div>
+              </div>
+            </div>
+          </div>
+          <!-- 논문: max=31 -->
+          <div class="comp-row">
+            <div class="comp-cat">📄 논문</div>
+            <div class="comp-bars">
+              <div class="comp-bar-wrap">
+                <div class="comp-yr">2025</div>
+                <div class="comp-track"><div class="comp-fill" style="width:100%;background:#c4b5fd"></div></div>
+                <div class="comp-n" style="color:#7c3aed">31</div>
+              </div>
+              <div class="comp-bar-wrap">
+                <div class="comp-yr">2026</div>
+                <div class="comp-track"><div class="comp-fill" style="width:26%;background:#7c3aed"></div></div>
+                <div class="comp-n" style="color:#7c3aed">8</div>
+              </div>
+            </div>
+          </div>
+          <!-- SW: max=21 -->
+          <div class="comp-row">
+            <div class="comp-cat">💻 SW</div>
+            <div class="comp-bars">
+              <div class="comp-bar-wrap">
+                <div class="comp-yr">2025</div>
+                <div class="comp-track"><div class="comp-fill" style="width:100%;background:#6ee7b7"></div></div>
+                <div class="comp-n" style="color:#059669">21</div>
+              </div>
+              <div class="comp-bar-wrap">
+                <div class="comp-yr">2026</div>
+                <div class="comp-track"><div class="comp-fill" style="width:10%;background:#059669"></div></div>
+                <div class="comp-n" style="color:#059669">2</div>
+              </div>
+            </div>
+          </div>
+          <!-- 기술이전: max=4 -->
+          <div class="comp-row">
+            <div class="comp-cat">🤝 기술이전</div>
+            <div class="comp-bars">
+              <div class="comp-bar-wrap">
+                <div class="comp-yr">2025</div>
+                <div class="comp-track"><div class="comp-fill" style="width:25%;background:#fed7aa"></div></div>
+                <div class="comp-n" style="color:#ea580c">1</div>
+              </div>
+              <div class="comp-bar-wrap">
+                <div class="comp-yr">2026</div>
+                <div class="comp-track"><div class="comp-fill" style="width:0%;background:#ea580c"></div></div>
+                <div class="comp-n" style="color:#94a3b8">0</div>
+              </div>
+            </div>
+          </div>
+          <!-- 장비: max=21 -->
+          <div class="comp-row">
+            <div class="comp-cat">⚙️ 장비</div>
+            <div class="comp-bars">
+              <div class="comp-bar-wrap">
+                <div class="comp-yr">2025</div>
+                <div class="comp-track"><div class="comp-fill" style="width:100%;background:#a5f3fc"></div></div>
+                <div class="comp-n" style="color:#0891b2">21</div>
+              </div>
+              <div class="comp-bar-wrap">
+                <div class="comp-yr">2026</div>
+                <div class="comp-track"><div class="comp-fill" style="width:100%;background:#0891b2"></div></div>
+                <div class="comp-n" style="color:#0891b2">21</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p style="font-size:10px;color:var(--light);margin-top:12px">※ 2026 수치는 3월 기준, 연간 누적 집계 중</p>
+      </div>
+    </div>
+
+    <div class="sec-label">파일 바로가기 (SharePoint 연동)</div>
+    <div class="links-row">
+      <div class="link-card">
+        <div class="link-card-head"><span>🔬</span> 특허</div>
+        <a class="lbtn lbtn-curr" href="https://kiapirnd.sharepoint.com/:x:/s/msteams_ce5564/IQDh6ZxgMyyQQqjXjV3LUJWvAXKMXZ2TUo3_aObifJij01w?e=e5IWma" target="_blank"><span class="lbtn-ico">📂</span><span class="lbtn-txt">2026 특허 실적</span></a>
+        <a class="lbtn lbtn-hist" href="https://kiapirnd.sharepoint.com/:x:/s/msteams_ce5564/IQABN-DeETeOQ7PPcjBMPtBJAekR9rProsqqM480G1fUFiU?e=QgffgZ" target="_blank"><span class="lbtn-ico">📋</span><span class="lbtn-txt">2020~2025 리스트</span></a>
+      </div>
+      <div class="link-card">
+        <div class="link-card-head"><span>📄</span> 학술논문</div>
+        <a class="lbtn lbtn-curr" href="https://kiapirnd.sharepoint.com/:x:/s/msteams_ce5564/IQBNcZ390F-rTLHtqmMgGr-yAetvquGvoxq_88ixItGwXbU?e=QDs0zS" target="_blank"><span class="lbtn-ico">📂</span><span class="lbtn-txt">2026 논문 실적</span></a>
+        <a class="lbtn lbtn-hist" href="https://kiapirnd.sharepoint.com/:x:/s/msteams_ce5564/IQD3NwbTAX9ETKHGUWh5mhxoAY9XvN7mvF4O8qvtFbZhPD4?e=YUnQiL" target="_blank"><span class="lbtn-ico">📋</span><span class="lbtn-txt">2020~2025 리스트</span></a>
+      </div>
+      <div class="link-card">
+        <div class="link-card-head"><span>💻</span> SW 등록</div>
+        <a class="lbtn lbtn-curr" href="https://kiapirnd.sharepoint.com/:x:/s/msteams_ce5564/IQAWIFKYmlsyQrex3l31xUkHAQkdU5ezZsCYLCC5aHxDGrE?e=GZ0Je0" target="_blank"><span class="lbtn-ico">📂</span><span class="lbtn-txt">2026 SW 실적</span></a>
+        <a class="lbtn lbtn-hist" href="https://kiapirnd.sharepoint.com/:x:/s/msteams_ce5564/IQB0C1xiqwoOSbKIhZXJKgy-Aarx2yTlxyQsC1msT61V7fM?e=un5iWJ" target="_blank"><span class="lbtn-ico">📋</span><span class="lbtn-txt">2020~2025 리스트</span></a>
+      </div>
+      <div class="link-card">
+        <div class="link-card-head"><span>🤝</span> 기술이전</div>
+        <a class="lbtn lbtn-curr" href="https://kiapirnd.sharepoint.com/:x:/s/msteams_ce5564/IQBK-X43P0a1QK6nJeY7fc9JAWibuaeF5usjWNiW_dOgOlo?e=bs7Csg" target="_blank"><span class="lbtn-ico">📂</span><span class="lbtn-txt">2026 기술이전 실적</span></a>
+        <a class="lbtn lbtn-hist" href="https://kiapirnd.sharepoint.com/:x:/s/msteams_ce5564/IQDadj6gc2lsRYVFrMZyyDr7AWi23m0fLi0EMK1hw4S5nkA?e=L51280" target="_blank"><span class="lbtn-ico">📋</span><span class="lbtn-txt">2020~2025 리스트</span></a>
+      </div>
+      <div class="link-card">
+        <div class="link-card-head"><span>⚙️</span> 장비관리</div>
+        <a class="lbtn lbtn-curr" href="https://kiapirnd.sharepoint.com/:x:/s/msteams_ce5564/IQBbi6c_LWIeS5_dJrw9-p8rAQ4zh7KKhQ8A-64vFBrLXWk?e=IGRBCB" target="_blank"><span class="lbtn-ico">📂</span><span class="lbtn-txt">2026 장비 현황</span></a>
+        <a class="lbtn lbtn-team" href="https://teams.microsoft.com/l/channel/19%3Af3700f0ee62b456a8277e341f5749ae7%40thread.tacv2/05_%EC%9E%A5%EB%B9%84%EA%B4%80%EB%A6%AC?groupId=f144ac9d-c80f-4314-86af-46ab8bba6bd8&tenantId=4b40a308-ba7f-4f86-adfe-92813ae5db36" target="_blank"><span class="lbtn-ico">💬</span><span class="lbtn-txt">장비 사용 일지 (Teams)</span></a>
+      </div>
+    </div>
+    <div class="sec-label">연도별 누적 실적 현황</div>
+    <div class="hist-card">
+      <table class="ht">
+        <thead><tr><th>연도</th><th>🔬 특허</th><th>📄 논문</th><th>💻 SW 등록</th><th>🤝 기술이전</th><th>⚙️ 장비(누적)</th><th>연간 합계</th></tr></thead>
+        <tbody>
+          <tr><td>2020</td><td class="c-pat">10</td><td class="c-pap">13</td><td class="c-sw">5</td><td class="c-tec">0</td><td class="c-eq">12</td><td class="c-tot">40</td></tr>
+          <tr><td>2021</td><td class="c-pat">15</td><td class="c-pap">25</td><td class="c-sw">11</td><td class="c-tec">2</td><td class="c-eq">14</td><td class="c-tot">67</td></tr>
+          <tr><td>2022</td><td class="c-pat">18</td><td class="c-pap">19</td><td class="c-sw">7</td><td class="c-tec">1</td><td class="c-eq">14</td><td class="c-tot">59</td></tr>
+          <tr><td>2023</td><td class="c-pat">34</td><td class="c-pap">24</td><td class="c-sw">12</td><td class="c-tec">2</td><td class="c-eq">14</td><td class="c-tot">86</td></tr>
+          <tr><td>2024</td><td class="c-pat">23</td><td class="c-pap">22</td><td class="c-sw">5</td><td class="c-tec">4</td><td class="c-eq">16</td><td class="c-tot">70</td></tr>
+          <tr><td>2025</td><td class="c-pat">30</td><td class="c-pap">31</td><td class="c-sw">21</td><td class="c-tec">1</td><td class="c-eq">21</td><td class="c-tot">104</td></tr>
+          <tr class="yr-2026"><td>2026 ★</td><td class="c-pat">4</td><td class="c-pap">8</td><td class="c-sw">2</td><td class="c-tec">0</td><td class="c-eq">21</td><td class="c-tot">35</td></tr>
+        </tbody>
+      </table>
+      <p class="note">※ 2026년 수치는 2026.03.31 기준 &nbsp;|&nbsp; 장비 현황은 전략기획본부 소관 누적 보유 대수</p>
+    </div>
+  </div><!-- /page:overview -->
+
+  <!-- ══ PAGE: 특허 ══ -->
+  <div class="page-section" data-page="patent" style="display:none">
+    <div class="page-links">
+      <span class="page-links-label">바로가기</span>
+      <a class="lbtn lbtn-curr" href="https://kiapirnd.sharepoint.com/:x:/s/msteams_ce5564/IQDh6ZxgMyyQQqjXjV3LUJWvAXKMXZ2TUo3_aObifJij01w?e=e5IWma" target="_blank"><span class="lbtn-ico">📂</span><span class="lbtn-txt">2026 특허 실적</span></a>
+      <a class="lbtn lbtn-hist" href="https://kiapirnd.sharepoint.com/:x:/s/msteams_ce5564/IQABN-DeETeOQ7PPcjBMPtBJAekR9rProsqqM480G1fUFiU?e=QgffgZ" target="_blank"><span class="lbtn-ico">📋</span><span class="lbtn-txt">2020~2025 리스트</span></a>
+    </div>
+    <div class="tbl-card">
+      <div class="tbl-head">
+        <div class="tbl-ico tbl-ico-patent">🔬</div>
+        <div class="tbl-head-text"><h3>2026 특허 등록·출원</h3><p>대한민국 특허청 기준</p></div>
+        <div class="badge-cnt">4건</div>
+      </div>
+      <table class="dt">
+        <thead><tr><th>No</th><th>발명 명칭</th><th>구분</th><th>출원/등록번호</th></tr></thead>
+        <tbody>
+          <tr><td><span class="num-badge">1</span></td><td>운전자 생체정보 기반의 비상정지 시스템 및 방법</td><td><span class="tag tag-reg">등록</span></td><td style="white-space:nowrap;color:var(--muted)">10-2910458</td></tr>
+          <tr><td><span class="num-badge">2</span></td><td>이종 자율주행 자동차의 인공지능 인지 모델 호환성을 위한 라이다 센서 특성 기반 딥러닝시스템 및 방법</td><td><span class="tag tag-reg">등록</span></td><td style="white-space:nowrap;color:var(--muted)">10-2918002</td></tr>
+          <tr><td><span class="num-badge">3</span></td><td>자율 주행 차량의 센서 데이터 계측을 이용한 시나리오 라벨링 시스템 및 방법</td><td><span class="tag tag-reg">등록</span></td><td style="white-space:nowrap;color:var(--muted)">10-2966809</td></tr>
+          <tr><td><span class="num-badge">4</span></td><td>자율주행 이동체의 제어방법</td><td><span class="tag tag-app">출원</span></td><td style="white-space:nowrap;color:var(--muted)">10-2026-0092377</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div><!-- /page:patent -->
+
+  <!-- ══ PAGE: 논문 ══ -->
+  <div class="page-section" data-page="paper" style="display:none">
+    <div class="page-links">
+      <span class="page-links-label">바로가기</span>
+      <a class="lbtn lbtn-curr" href="https://kiapirnd.sharepoint.com/:x:/s/msteams_ce5564/IQBNcZ390F-rTLHtqmMgGr-yAetvquGvoxq_88ixItGwXbU?e=QDs0zS" target="_blank"><span class="lbtn-ico">📂</span><span class="lbtn-txt">2026 논문 실적</span></a>
+      <a class="lbtn lbtn-hist" href="https://kiapirnd.sharepoint.com/:x:/s/msteams_ce5564/IQD3NwbTAX9ETKHGUWh5mhxoAY9XvN7mvF4O8qvtFbZhPD4?e=YUnQiL" target="_blank"><span class="lbtn-ico">📋</span><span class="lbtn-txt">2020~2025 리스트</span></a>
+    </div>
+    <div class="paper-card">
+      <div class="tbl-head">
+        <div class="tbl-ico tbl-ico-paper">📄</div>
+        <div class="tbl-head-text"><h3>2026 학술논문 발표</h3><p>국내·외 학술대회 및 논문지</p></div>
+        <div class="badge-cnt">8건</div>
+      </div>
+      <table class="dt">
+        <thead><tr><th>No</th><th>논문명</th><th>국가</th><th>분류</th><th>게재지 / 학술대회</th><th>게재일</th><th>지원과제</th></tr></thead>
+        <tbody>
+          <tr><td><span class="num-badge">1</span></td><td>Hybrid 3D Graph Convolutional Network and Transformer for Lidar Fault Detection</td><td><span class="tag tag-intl">국제</span></td><td><span class="tag tag-conf">학술대회</span></td><td>ICAIIC 2026 (Tokyo Univ. of Science, Japan)</td><td style="white-space:nowrap">2026.02.25</td><td>원격지원</td></tr>
+          <tr><td><span class="num-badge">2</span></td><td>자율주행 사고 재현 소프트웨어 평가를 위한 멀티모달 데이터 기반 재현성 검증 프레임워크 설계</td><td><span class="tag tag-dom">국내</span></td><td><span class="tag tag-conf">학술대회</span></td><td>2026 한국자동차공학회 춘계학술대회 (ICC 제주)</td><td style="white-space:nowrap">2026.05.20</td><td>사고재현</td></tr>
+          <tr><td><span class="num-badge">3</span></td><td>상호작용 다중 모델 필터를 활용한 GPS 기만 공격 탐지</td><td><span class="tag tag-dom">국내</span></td><td><span class="tag tag-conf">학술대회</span></td><td>2026 한국자동차공학회 춘계학술대회 (ICC 제주)</td><td style="white-space:nowrap">2026.05.21</td><td>기능재구성</td></tr>
+          <tr><td><span class="num-badge">4</span></td><td>SUMO를 활용한 신호 교차로 내 자율주행차 MRM 감속 패턴이 교통류 안전 및 효율에 미치는 영향 분석</td><td><span class="tag tag-dom">국내</span></td><td><span class="tag tag-conf">학술대회</span></td><td>2026 한국자동차공학회 춘계학술대회 (ICC 제주)</td><td style="white-space:nowrap">2026.05.21</td><td>3Tier통합검증</td></tr>
+          <tr><td><span class="num-badge">5</span></td><td>단안 카메라를 위한 주파수 영역 가이드 기반 깊이 추정</td><td><span class="tag tag-dom">국내</span></td><td><span class="tag tag-conf">학술대회</span></td><td>2026 한국통신학회 하계종합학술발표회 (해비치 호텔&amp;리조트 제주)</td><td style="white-space:nowrap">2026.06~</td><td>원격지원</td></tr>
+          <tr><td><span class="num-badge">6</span></td><td>자율주행 소프트웨어 검증을 위한 CARLA-ROS2 기반 SILS 환경 구축</td><td><span class="tag tag-dom">국내</span></td><td><span class="tag tag-conf">학술대회</span></td><td>2026 한국통신학회 하계종합학술발표회 (해비치 호텔&amp;리조트 제주)</td><td style="white-space:nowrap">2026.06~</td><td>원격지원</td></tr>
+          <tr><td><span class="num-badge">7</span></td><td>점유 면적을 이용한 회피경로의 검증 방법</td><td><span class="tag tag-dom">국내</span></td><td><span class="tag tag-conf">학술대회</span></td><td>2026 한국통신학회 하계종합학술발표회 (해비치 호텔&amp;리조트 제주)</td><td style="white-space:nowrap">2026.06~</td><td>원격지원</td></tr>
+          <tr><td><span class="num-badge">8</span></td><td>자율주행 원격지원 중 통신 단절 및 복합 고장 대응을 위한 동역학 기반 계층적 안전 정지 시스템</td><td><span class="tag tag-dom">국내</span></td><td><span class="tag tag-conf">학술대회</span></td><td>2026 한국통신학회 하계종합학술발표회 (해비치 호텔&amp;리조트 제주)</td><td style="white-space:nowrap">2026.06~</td><td>원격지원</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div><!-- /page:paper -->
+
+  <!-- ══ PAGE: SW 등록 ══ -->
+  <div class="page-section" data-page="sw" style="display:none">
+    <div class="page-links">
+      <span class="page-links-label">바로가기</span>
+      <a class="lbtn lbtn-curr" href="https://kiapirnd.sharepoint.com/:x:/s/msteams_ce5564/IQAWIFKYmlsyQrex3l31xUkHAQkdU5ezZsCYLCC5aHxDGrE?e=GZ0Je0" target="_blank"><span class="lbtn-ico">📂</span><span class="lbtn-txt">2026 SW 실적</span></a>
+      <a class="lbtn lbtn-hist" href="https://kiapirnd.sharepoint.com/:x:/s/msteams_ce5564/IQB0C1xiqwoOSbKIhZXJKgy-Aarx2yTlxyQsC1msT61V7fM?e=un5iWJ" target="_blank"><span class="lbtn-ico">📋</span><span class="lbtn-txt">2020~2025 리스트</span></a>
+    </div>
+    <div class="tbl-card">
+      <div class="tbl-head">
+        <div class="tbl-ico tbl-ico-sw">💻</div>
+        <div class="tbl-head-text"><h3>2026 SW 저작권 등록</h3><p>한국저작권위원회 기준</p></div>
+        <div class="badge-cnt">2건</div>
+      </div>
+      <table class="dt">
+        <thead><tr><th>No</th><th>소프트웨어 명칭</th><th>등록번호</th><th>지원과제</th></tr></thead>
+        <tbody>
+          <tr><td><span class="num-badge">1</span></td><td>자율주행차량을 위한 이종 지도 파일 형식 자동 변환 소프트웨어</td><td style="white-space:nowrap;color:var(--muted)">C-2026-017010</td><td><span class="tag tag-journ">원격지원</span></td></tr>
+          <tr><td><span class="num-badge">2</span></td><td>전기자동차 주행 경고음 발생장치 소음 특성 분석을 위한 모니터링 프로그램</td><td style="white-space:nowrap;color:var(--muted)">C-2026-023765</td><td><span class="tag tag-journ">전기차안전성</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div><!-- /page:sw -->
+
+  <!-- ══ PAGE: 기술이전 ══ -->
+  <div class="page-section" data-page="tech" style="display:none">
+    <div class="page-links">
+      <span class="page-links-label">바로가기</span>
+      <a class="lbtn lbtn-curr" href="https://kiapirnd.sharepoint.com/:x:/s/msteams_ce5564/IQBK-X43P0a1QK6nJeY7fc9JAWibuaeF5usjWNiW_dOgOlo?e=bs7Csg" target="_blank"><span class="lbtn-ico">📂</span><span class="lbtn-txt">2026 기술이전 파일</span></a>
+      <a class="lbtn lbtn-hist" href="https://kiapirnd.sharepoint.com/:x:/s/msteams_ce5564/IQDadj6gc2lsRYVFrMZyyDr7AWi23m0fLi0EMK1hw4S5nkA?e=L51280" target="_blank"><span class="lbtn-ico">📋</span><span class="lbtn-txt">2020~2025 기술이전 리스트</span></a>
+    </div>
+    <div class="tbl-card">
+      <div class="tbl-head">
+        <div class="tbl-ico" style="background:#ffedd5">🤝</div>
+        <div class="tbl-head-text"><h3>2026 기술이전 실적</h3><p>계약 체결 기준</p></div>
+        <div class="badge-cnt">0건</div>
+      </div>
+      <p style="font-size:13px;color:var(--muted);padding:16px 4px 8px">2026년 기술이전 실적이 아직 없습니다.</p>
+    </div>
+  </div><!-- /page:tech -->
+
+  <!-- ══ PAGE: 장비관리 ══ -->
+  <div class="page-section" data-page="history" style="display:none">
+    <div class="page-links">
+      <span class="page-links-label">바로가기</span>
+      <a class="lbtn lbtn-curr" href="https://kiapirnd.sharepoint.com/:x:/s/msteams_ce5564/IQBbi6c_LWIeS5_dJrw9-p8rAQ4zh7KKhQ8A-64vFBrLXWk?e=IGRBCB" target="_blank"><span class="lbtn-ico">📂</span><span class="lbtn-txt">2026 장비 현황</span></a>
+      <a class="lbtn lbtn-team" href="https://teams.microsoft.com/l/channel/19%3Af3700f0ee62b456a8277e341f5749ae7%40thread.tacv2/05_%EC%9E%A5%EB%B9%84%EA%B4%80%EB%A6%AC?groupId=f144ac9d-c80f-4314-86af-46ab8bba6bd8&tenantId=4b40a308-ba7f-4f86-adfe-92813ae5db36" target="_blank"><span class="lbtn-ico">💬</span><span class="lbtn-txt">장비 사용 일지 (Teams)</span></a>
+    </div>
+    <div class="sec-label">연도별 누적 실적 현황</div>
+    <div class="hist-card">
+      <table class="ht">
+        <thead><tr><th>연도</th><th>🔬 특허</th><th>📄 논문</th><th>💻 SW 등록</th><th>🤝 기술이전</th><th>⚙️ 장비(누적)</th><th>연간 합계</th></tr></thead>
+        <tbody>
+          <tr><td>2020</td><td class="c-pat">10</td><td class="c-pap">13</td><td class="c-sw">5</td><td class="c-tec">0</td><td class="c-eq">12</td><td class="c-tot">40</td></tr>
+          <tr><td>2021</td><td class="c-pat">15</td><td class="c-pap">25</td><td class="c-sw">11</td><td class="c-tec">2</td><td class="c-eq">14</td><td class="c-tot">67</td></tr>
+          <tr><td>2022</td><td class="c-pat">18</td><td class="c-pap">19</td><td class="c-sw">7</td><td class="c-tec">1</td><td class="c-eq">14</td><td class="c-tot">59</td></tr>
+          <tr><td>2023</td><td class="c-pat">34</td><td class="c-pap">24</td><td class="c-sw">12</td><td class="c-tec">2</td><td class="c-eq">14</td><td class="c-tot">86</td></tr>
+          <tr><td>2024</td><td class="c-pat">23</td><td class="c-pap">22</td><td class="c-sw">5</td><td class="c-tec">4</td><td class="c-eq">16</td><td class="c-tot">70</td></tr>
+          <tr><td>2025</td><td class="c-pat">30</td><td class="c-pap">31</td><td class="c-sw">21</td><td class="c-tec">1</td><td class="c-eq">21</td><td class="c-tot">104</td></tr>
+          <tr class="yr-2026"><td>2026 ★</td><td class="c-pat">4</td><td class="c-pap">8</td><td class="c-sw">2</td><td class="c-tec">0</td><td class="c-eq">21</td><td class="c-tot">35</td></tr>
+        </tbody>
+      </table>
+      <p class="note">※ 2026년 수치는 2026.03.31 기준 &nbsp;|&nbsp; 장비 현황은 전략기획본부 소관 누적 보유 대수</p>
+    </div>
+  </div><!-- /page:history -->
+
+</div>
+
+<div class="footer">
+  <span>(재)지능형자동차부품진흥원 전략기획본부 &nbsp;·&nbsp; 원본: 2026 전략기획본부 실적 관리 통합.xlsx</span>
+  <span>SharePoint 연동 &nbsp;·&nbsp; 2026.03.31 기준</span>
+</div>
+
+<script>
+Chart.defaults.font.family = "'Pretendard','Nanum Gothic','맑은 고딕',sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.color = '#64748b';
+
+// ── 연도별 추이 차트 ──
+new Chart(document.getElementById('trendChart'), {
+  type: 'bar',
+  data: {
+    labels: ['2020','2021','2022','2023','2024','2025','2026*'],
+    datasets: [
+      { label:'특허',    data:[10,15,18,34,23,30,4], backgroundColor:'#3b82f6', borderRadius:4, stack:'s' },
+      { label:'논문',    data:[13,25,19,24,22,31,8], backgroundColor:'#a78bfa', borderRadius:4, stack:'s' },
+      { label:'SW 등록', data:[5,11,7,12,5,21,2],    backgroundColor:'#34d399', borderRadius:4, stack:'s' },
+      { label:'기술이전', data:[0,2,1,2,4,1,0],      backgroundColor:'#fb923c', borderRadius:4, stack:'s' }
+    ]
+  },
+  options: {
+    responsive:true,
+    plugins: {
+      legend:{ display:false },
+      tooltip:{ mode:'index', intersect:false }
+    },
+    scales: {
+      x:{ grid:{ display:false }, border:{ display:false } },
+      y:{ grid:{ color:'#f1f5f9' }, border:{ display:false }, ticks:{ stepSize:20 } }
+    }
+  }
+});
+
+// ── 탭 페이지 전환 ──
+const pageMap = {
+  'section-summary': 'overview',
+  'section-patent':  'patent',
+  'section-paper':   'paper',
+  'section-sw':      'sw',
+  'section-tech':    'tech',
+  'section-history': 'history'
+};
+
+function showPage(pageName) {
+  document.querySelectorAll('.page-section').forEach(s => {
+    s.style.display = s.dataset.page === pageName ? '' : 'none';
+  });
+  // 상단으로 스크롤
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.querySelectorAll('.nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const page = pageMap[tab.dataset.target] || 'overview';
+    showPage(page);
+  });
+});
+
+
+</script>
+</body>
+</html>
